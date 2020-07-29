@@ -17,7 +17,7 @@
                         <main role="main">
                             <div class="jumbotron">
                                 <p class="col-sm-8 mx-auto">
-                                <h1>Navbar examples</h1>
+                                <h1>API Blade</h1>
                                 <p>Various experiments with APIs in Laravel 7, using stock Blade templates.</p>
                                 <p>
                                     <a class="btn btn-primary" href="https://github.com/lasellers/ApiBlade" role="button">View README.md &raquo;</a>

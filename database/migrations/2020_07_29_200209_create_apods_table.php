@@ -34,6 +34,6 @@ class CreateApodsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('apod');
+        Schema::dropIfExists('apods');
     }
 }

@@ -14,7 +14,7 @@ class ApodSeeder extends Seeder
     {
         Apod::create([
             'title' => 'Title Test',
-            'date'=>'2020-01-02',
+            'date' => '2020-01-02',
             'copyright' => 'Copyright',
             'explanation' => 'Explanation',
             'media_type' => 'Media_type',
@@ -22,5 +22,7 @@ class ApodSeeder extends Seeder
             'url' => 'Url',
             'hd_url' => 'Hd Url',
         ]);
+
+        \Artisan::call('apod:get');
     }
 }

@@ -1,0 +1,92 @@
+# See https://hub.docker.com/_/mariadb
+
+# See README.md
+
+# sudo docker network inspect apiblade_default
+
+#  sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+#  sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+#  sudo ln -s /etc/apparmor.d/usr.sbin.snap.mysql-workbench-community.mysql-workbench-community /etc/apparmor.d/disable/
+#  sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.snap.mysql-workbench-community.mysql-workbench-community
+
+# sudo systemctl disable apparmor
+# sudo aa-status
+
+# sudo snap connect mysql-workbench-community:password-manager-service :password-manager-service
+# snap connect mysql-workbench-community:ssh-keys
+
+# sudo docker-compose -f Dockerfile up
+# sudo docker exec -it apiblade /bin/bash
+# mysql -uroot -ppassword
+# show databases;
+# use ehr;
+# show tables;
+
+version: '3.1'
+services:
+  #PHP Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: digitalocean.com/php
+    container_name: apibladeapp
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    networks:
+      - apiblade_default
+
+  webserver:
+    image: nginx:alpine
+    container_name: apibladewebserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - apiblade_default
+
+  apiblade:
+    image: mariadb
+    #build:
+    #  context: ./apiblade/
+    #  dockerfile: ../Dockerfile
+    restart: always
+    #hostname: ehr.localhost.com
+    hostname: localhost
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    container_name: apibladedb
+    environment:
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MARIADB_USER=${DB_USERNAME}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+    volumes:
+      #  - apibladedb:/var/lib/mysql
+      - ./database/initdb:/docker-entrypoint-initdb.d
+      # - ./db:/var/lib/mysql
+    networks:
+      apiblade_default:
+         #ipv4_address: 172.18.0.1
+
+#volumes:
+#  apiblade:
+
+networks:
+  apiblade_default:
+    #ipam:
+      #driver: default
+      #config:
+      #  - subnet: 172.18.0.0/16

@@ -46,31 +46,28 @@ class GetApod extends Command
     public function handle()
     {
         $client = new GuzzleHttp\Client();
-        $res = $client->request('GET', 'https://api.nasa.gov/planetary/apod?api_key=' . env('NASA_API_KEY'), [
-            'auth' => ['user', 'pass']
-        ]);
-        echo $res->getStatusCode();
-// "200"
-        echo $res->getHeader('content-type')[0];
-// 'application/json; charset=utf8'
-        echo "\n\n body=\n";
-        $content=$res->getBody()->getContents();
-        print_r($content);
-// {"type":"User"...'
-        $json=json_decode($content, false);
-        print_r($json);
+        try {
+            $res = $client->request('GET', 'https://api.nasa.gov/planetary/apod?api_key=' . env('NASA_API_KEY'), [
+                'auth' => ['user', 'pass']
+            ]);
 
-        $apod=new Apod();
-        $apod->title=$json->title;
-        $apod->copyright=$json->copyright;
-        $apod->date=$json->date;
-        $apod->explanation=$json->explanation;
-        $apod->media_type=$json->media_type;
-        $apod->service_version=$json->service_version;
-        $apod->url=$json->url;
-        $apod->hd_url=$json->hdurl;
-        $apod->save();
-      //  return view('apod', ['data' => decode_json($res->getBody())]);
-        return 0;
+            $content = $res->getBody()->getContents();
+            $json = json_decode($content, false);
+
+            $apod = new Apod();
+            $apod->title = $json->title;
+            $apod->copyright = $json->copyright;
+            $apod->date = $json->date;
+            $apod->explanation = $json->explanation;
+            $apod->media_type = $json->media_type;
+            $apod->service_version = $json->service_version;
+            $apod->url = $json->url;
+            $apod->hd_url = $json->hdurl;
+            $apod->save();
+
+            return 0;
+        } catch (\Exception $e) {
+            return 1;
+        }
     }
 }

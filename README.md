@@ -2,7 +2,7 @@
 
 Various experiments with APIs in Laravel 7, using stock Blade templates.
 
-## APIS
+## APIs
 
 ###  NASA Astronomy Photograph of the Day 
 

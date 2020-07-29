@@ -48,7 +48,6 @@ class GetApod extends Command
         $client = new GuzzleHttp\Client();
         try {
             $res = $client->request('GET', 'https://api.nasa.gov/planetary/apod?api_key=' . env('NASA_API_KEY'), [
-                'auth' => ['user', 'pass']
             ]);
 
             $content = $res->getBody()->getContents();

@@ -1,5 +1,5 @@
-/* CREATE DATABASE ehr; -- handled by mariadb docker automatically */
-USE ehr;
+/* CREATE DATABASE apiblade; -- handled by mariadb docker automatically */
+USE apiblade;
 /*  -- handled by mariadb docker automatically
 CREATE USER 'ehr' IDENTIFIED BY 'password';
 GRANT ALL ON *.* TO 'ehr'@'%';

@@ -24,46 +24,59 @@
 
 version: '3.1'
 services:
-  #PHP Service
+  webserver:
+    image: nginx:latest
+    restart: unless-stopped
+    tty: true
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/
+      - ./site.conf:/etc/nginx/conf.d/site.conf
+    networks:
+      default:
+      #ipv4_address: 172.28.0.5
+    # php artisan migrate:refresh --seed
+
   app:
     build:
       context: .
-      dockerfile: Dockerfile
-    image: digitalocean.com/php
-    container_name: apibladeapp
+      dockerfile: app.Dockerfile
+    #image: digitalocean.com/php
+    # container_name: apiblade_app
     restart: unless-stopped
+    depends_on:
+      - db
+      - redis
     tty: true
     environment:
       SERVICE_NAME: app
       SERVICE_TAGS: dev
-    working_dir: /var/www
-    networks:
-      - apiblade_default
-
-  webserver:
-    image: nginx:alpine
-    container_name: apibladewebserver
-    restart: unless-stopped
-    tty: true
     ports:
-      - "80:80"
-      - "443:443"
+      - "81:8000"
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
     networks:
-      - apiblade_default
+      default:
+        #ipv4_address: 172.28.0.4
 
-  apiblade:
+  db:
     image: mariadb
     #build:
     #  context: ./apiblade/
     #  dockerfile: ../Dockerfile
     restart: always
     #hostname: ehr.localhost.com
-    hostname: localhost
+    # hostname: localhost
     ports:
       - 3306:3306
     expose:
       - 3306
-    container_name: apibladedb
+    # container_name: apiblade_db
     environment:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
@@ -78,15 +91,31 @@ services:
       - ./database/initdb:/docker-entrypoint-initdb.d
       # - ./db:/var/lib/mysql
     networks:
-      apiblade_default:
-         #ipv4_address: 172.18.0.1
+      default:
+         #ipv4_address: 172.28.0.2
+
+  redis:
+    image: "redis:alpine"
+    command: redis-server
+    # command: redis-server --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379" # {$REDIS_PORT}
+    volumes:
+      - $PWD/redis-data:/var/lib/redis
+      - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      default:
+       #ipv4_address: 172.28.0.3
+      # ipv4_address: {$REDIS_HOST}
 
 #volumes:
 #  apiblade:
 
 networks:
-  apiblade_default:
+  default:
     #ipam:
       #driver: default
       #config:
-      #  - subnet: 172.18.0.0/16
+        # - subnet: 172.28.0.0/16

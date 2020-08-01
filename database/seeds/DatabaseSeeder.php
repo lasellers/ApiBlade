@@ -13,7 +13,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
-            ApodSeeder::class
+            ApodSeeder::class,
+            CountySeeder::class
         ]);
     }
 }
+

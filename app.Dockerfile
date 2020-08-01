@@ -18,5 +18,5 @@ opcache.max_accelerated_files=16000\n\
 opcache.save_comments=Off\n\
 ' >> /usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 
-RUN php artisan migrate:refresh --seed
+# RUN php artisan migrate:refresh --seed
 

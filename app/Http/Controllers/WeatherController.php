@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Apod;
+use App\County;
 use Illuminate\Http\Request;
 use GuzzleHttp;
 use Illuminate\Support\Facades\Redis;
 
 class WeatherController extends Controller
 {
+    public $location;
+
     /**
      * Create a new controller instance.
      *
@@ -26,18 +28,16 @@ class WeatherController extends Controller
      */
     public function index()
     {
-        $list = Redis::keys('*');
-
-        $cityName = "London";
+        $this->location = "Knoxville";
         $appid = env('WEATHER_API_KEY');
-        $redisString = "weather-{$cityName}-{$appid}";
+        $redisString = "weather-{$this->location}-{$appid}";
 
         $weather = json_decode(Redis::get($redisString));
 
         if (empty($weather)) {
             $client = new GuzzleHttp\Client();
-            //  try {
-            $res = $client->request('GET', 'http://api.openweathermap.org/data/2.5/weather?q=' . $cityName . '&appid=' . env('WEATHER_API_KEY'), [
+
+            $res = $client->request('GET', 'http://api.openweathermap.org/data/2.5/weather?q=' . $this->location . '&appid=' . env('WEATHER_API_KEY'), [
             ]);
 
             $content = $res->getBody()->getContents();
@@ -48,6 +48,8 @@ class WeatherController extends Controller
             if (is_string($weather))
                 $weather = json_decode($weather);
         }
+
+        $locations = County::dropdown()->toArray();
 
         return view('weather', [
             'icon' => $weather->weather[0]->main,
@@ -64,6 +66,9 @@ class WeatherController extends Controller
             'cloud_coverage' => $weather->clouds->all,
             'sunrise' => $weather->sys->sunrise,
             'sunset' => $weather->sys->sunset,
+            'location' => $this->location,
+            'locations' => $locations
         ]);
     }
+
 }

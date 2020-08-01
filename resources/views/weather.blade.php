@@ -16,6 +16,20 @@
                             </div>
                         @endif
 
+                        {{ $location }}
+
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="location"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Location
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                @foreach($locations as $key=>$value)
+                                    <a class="dropdown-item" href="#" key="{{$key}}">{{$value}}</a>
+                                @endforeach
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-3">icon</div>
                             <div class="col-9">{{$icon}}</div>

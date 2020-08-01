@@ -19,7 +19,7 @@
 # sudo docker exec -it apiblade /bin/bash
 # mysql -uroot -ppassword
 # show databases;
-# use ehr;
+# use apiblade;
 # show tables;
 
 version: '3.1'
@@ -29,7 +29,7 @@ services:
     restart: unless-stopped
     tty: true
     depends_on:
-      - app
+      - phpapp
     ports:
       - "80:80"
       - "443:443"
@@ -41,7 +41,7 @@ services:
       #ipv4_address: 172.28.0.5
     # php artisan migrate:refresh --seed
 
-  app:
+  phpapp:
     build:
       context: .
       dockerfile: app.Dockerfile
@@ -70,7 +70,7 @@ services:
     #  context: ./apiblade/
     #  dockerfile: ../Dockerfile
     restart: always
-    #hostname: ehr.localhost.com
+    #hostname: apiblade.localhost.com
     # hostname: localhost
     ports:
       - 3306:3306
@@ -110,8 +110,29 @@ services:
        #ipv4_address: 172.28.0.3
       # ipv4_address: {$REDIS_HOST}
 
-#volumes:
+  memcached:
+    image: library/memcached:latest
+    ports:
+      - '11211:11211'
+
+  nosql:
+    image: mongo
+    # container_name: 'mongo-db'
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=apiblade
+      - MONGO_INITDB_PASSWORD=password
+    volumes:
+      #- ./init-mongo.js:/ocker-entrypoint-initdb.d/init-mongo.js:ro
+      #- ./mongo-volume:/data/db
+      - mongodb_data_container:/data/db
+    ports:
+      - '27017-27019:27017-27019'
+
+volumes:
 #  apiblade:
+  mongodb_data_container:
 
 networks:
   default:
@@ -119,3 +140,18 @@ networks:
       #driver: default
       #config:
         # - subnet: 172.28.0.0/16
+
+# mongo
+
+# sudo docker exec -it apiblade-mongo-db bash
+# mongo admin -u root -p password
+
+# show dbs
+# use mydb
+# db.mycol.save({"name":"test 1"})
+# db.mycol.save({"name":"test 1"})
+# db.mycol.save({"name":"test 1"})
+# db.mycol.save({"name":"test 2"})
+# show collections
+# db.mycol.find()
+# db.mycol.find({"name":"test 2"})

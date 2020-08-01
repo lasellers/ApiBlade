@@ -17,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/county/{id}', 'CountyController@county');
+Route::get('/counties', 'CountyController@counties');
+Route::get('/dropdown', 'CountyController@dropdown');
